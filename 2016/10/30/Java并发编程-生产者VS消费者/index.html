@@ -1,0 +1,750 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="googleff237f61db04f234.html" />
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Consolas, "Courier New":300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java并发编程," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="线程等待-通知模式最经典的案例就是生产者-消费者模式，这里我们通过简单的代码片来更好的了解线程之间的通讯。生产者-消费者模式基于wait/notify来实现的，简单的说下原理：当生产队列为空时，消费者无产品可消费，进入waiting状态，等待被生产者唤醒；当队列未达到最大值时，生产者可以生产，同时消费者进行消费；当队列达到最大值时，生产者停止生产，进入waiting状态，等待被消费者唤醒。">
+<meta name="keywords" content="Java并发编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发编程-生产者VS消费者">
+<meta property="og:url" content="http://geekerwang.com/2016/10/30/Java并发编程-生产者VS消费者/index.html">
+<meta property="og:site_name" content="Silencer2016">
+<meta property="og:description" content="线程等待-通知模式最经典的案例就是生产者-消费者模式，这里我们通过简单的代码片来更好的了解线程之间的通讯。生产者-消费者模式基于wait/notify来实现的，简单的说下原理：当生产队列为空时，消费者无产品可消费，进入waiting状态，等待被生产者唤醒；当队列未达到最大值时，生产者可以生产，同时消费者进行消费；当队列达到最大值时，生产者停止生产，进入waiting状态，等待被消费者唤醒。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-23T14:06:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java并发编程-生产者VS消费者">
+<meta name="twitter:description" content="线程等待-通知模式最经典的案例就是生产者-消费者模式，这里我们通过简单的代码片来更好的了解线程之间的通讯。生产者-消费者模式基于wait/notify来实现的，简单的说下原理：当生产队列为空时，消费者无产品可消费，进入waiting状态，等待被生产者唤醒；当队列未达到最大值时，生产者可以生产，同时消费者进行消费；当队列达到最大值时，生产者停止生产，进入waiting状态，等待被消费者唤醒。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://geekerwang.com/2016/10/30/Java并发编程-生产者VS消费者/"/>
+
+
+  <title> Java并发编程-生产者VS消费者 | Silencer2016 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-83679096-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?00970040195e9a299a86718b9e4b4a2c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=58215292";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Silencer2016</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java并发编程-生产者VS消费者
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-30T08:43:35+08:00" content="2016-10-30">
+              2016-10-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/JAVA/" itemprop="url" rel="index">
+                    <span itemprop="name">JAVA</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+          
+
+          
+              &nbsp; | &nbsp;
+              <span class="page-pv">本文被围观
+              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+              </span>
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>线程等待-通知模式最经典的案例就是生产者-消费者模式，这里我们通过简单的代码片来更好的了解线程之间的通讯。<br>生产者-消费者模式基于wait/notify来实现的，简单的说下原理：当生产队列为空时，消费者无产品可消费，进入waiting状态，等待被生产者唤醒；当队列未达到最大值时，生产者可以生产，同时消费者进行消费；当队列达到最大值时，生产者停止生产，进入waiting状态，等待被消费者唤醒。</p>
+<a id="more"></a>
+<h4 id="关键字"><a href="#关键字" class="headerlink" title="关键字"></a>关键字</h4><p>简单的说明下使用的几个关键字</p>
+<ul>
+<li><strong>wait</strong><ul>
+<li>调用wait时必须先获取共享对象锁</li>
+<li>wait是一个释放锁的操作</li>
+<li>wait之后的代码暂停执行的直到得到notify通知</li>
+</ul>
+</li>
+<li><strong>notify</strong> <ul>
+<li>调用notify时必须先获取共享对象锁</li>
+<li>notify会随机通知一个等待该对象锁的处于waiting状态的线程，使其进入Runnable</li>
+<li>如果没有等待该对象锁的且处于waiting状态的线程，那么notify指令将被忽略</li>
+<li>当前仅当执行notify方法的线程将程序执行完毕时，才会释放锁，处于waiting状态的线程才可能获取锁</li>
+</ul>
+</li>
+<li><strong>notifyAll</strong> <ul>
+<li>notifyAll通知所有等待该对象锁的处于waiting状态的线程，使其进入Runnable，谁先执行取决于JVM</li>
+</ul>
+</li>
+</ul>
+<h4 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProAndConBySyn</span> </span>&#123;</div><div class="line">    <span class="comment">//已生产产品队列</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;String&gt; readyList = <span class="keyword">new</span> ArrayList&lt;String&gt;();</div><div class="line">    <span class="comment">//待生产产品队列</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;String&gt; prepaList = <span class="keyword">new</span> ArrayList&lt;String&gt;();</div><div class="line"></div><div class="line">    <span class="comment">//待生产产品队列初始化</span></div><div class="line">    <span class="keyword">static</span> &#123;</div><div class="line">        prepaList.add(<span class="string">"产品1"</span>);</div><div class="line">        prepaList.add(<span class="string">"产品2"</span>);</div><div class="line">        prepaList.add(<span class="string">"产品3"</span>);</div><div class="line">        prepaList.add(<span class="string">"产品4"</span>);</div><div class="line">        prepaList.add(<span class="string">"产品5"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_SIZE = <span class="number">5</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MIN_SIZW = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="comment">//生产者</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Runnable producter = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="comment">//每个生产者都在不停工作</span></div><div class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</div><div class="line">                <span class="keyword">synchronized</span> (readyList) &#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        <span class="comment">//①生产者停止生产的条件,思考:为什么是while而不是if</span></div><div class="line">                        <span class="keyword">while</span> (readyList.size() == MAX_SIZE) &#123;</div><div class="line">                            readyList.wait();</div><div class="line">                        &#125;</div><div class="line">                        Thread.sleep(<span class="number">1000</span>);</div><div class="line"></div><div class="line">                        String productor = prepaList.remove(<span class="keyword">new</span> Random().nextInt(prepaList.size()));</div><div class="line">                        readyList.add(productor);</div><div class="line">                        System.out.println(Thread.currentThread().getName()</div><div class="line">                                + <span class="string">"生产了【"</span> + productor + <span class="string">"】当前共有产品"</span> + readyList.size());</div><div class="line"></div><div class="line">                        <span class="comment">//②通知所有等待readyList锁的线程,思考:如果换成notify会出现什么结果</span></div><div class="line">                        readyList.notifyAll();</div><div class="line">                        <span class="comment">//③让出锁,为了使每一个生产者公平工作,思考:如果去掉下述代码会出现什么结果</span></div><div class="line">                        readyList.wait();</div><div class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="comment">//消费者</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Runnable consumer = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</div><div class="line">                <span class="keyword">synchronized</span> (readyList) &#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        <span class="keyword">while</span> (readyList.size() == MIN_SIZW) &#123;</div><div class="line">                            readyList.wait();</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        Thread.sleep(<span class="number">1000</span>);</div><div class="line">                        String productor = readyList.get(<span class="number">0</span>);</div><div class="line">                        readyList.remove(<span class="number">0</span>);</div><div class="line">                        prepaList.add(productor);</div><div class="line">                        System.out.println(Thread.currentThread().getName()</div><div class="line">                                + <span class="string">"消费了【"</span> + productor + <span class="string">"】当前共有产品"</span> + readyList.size());</div><div class="line"></div><div class="line">                        readyList.notifyAll();</div><div class="line">                        readyList.wait();</div><div class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="comment">//三个生产者</span></div><div class="line">        Thread threadP1 = <span class="keyword">new</span> Thread(producter, <span class="string">"生产者1"</span>);</div><div class="line">        Thread threadP2 = <span class="keyword">new</span> Thread(producter, <span class="string">"生产者2"</span>);</div><div class="line">        Thread threadP3 = <span class="keyword">new</span> Thread(producter, <span class="string">"生产者3"</span>);</div><div class="line"></div><div class="line">        <span class="comment">//两个消费者</span></div><div class="line">        Thread threadC1 = <span class="keyword">new</span> Thread(consumer, <span class="string">"消费者1"</span>);</div><div class="line">        Thread threadC2 = <span class="keyword">new</span> Thread(consumer, <span class="string">"消费者2"</span>);</div><div class="line"></div><div class="line">        threadC1.start();</div><div class="line">        threadC2.start();</div><div class="line"></div><div class="line">        threadP1.start();</div><div class="line">        threadP2.start();</div><div class="line">        threadP3.start();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>代码很少，结构也很简单，运行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">生产者1生产了【产品4】当前共有产品1</div><div class="line">消费者2消费了【产品4】当前共有产品0</div><div class="line">生产者3生产了【产品1】当前共有产品1</div><div class="line">生产者2生产了【产品2】当前共有产品2</div><div class="line">生产者3生产了【产品5】当前共有产品3</div><div class="line">消费者1消费了【产品1】当前共有产品2</div><div class="line">消费者2消费了【产品2】当前共有产品1</div><div class="line">生产者1生产了【产品2】当前共有产品2</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<h4 id="Lock实现方式"><a href="#Lock实现方式" class="headerlink" title="Lock实现方式"></a>Lock实现方式</h4><p>lock实现方式相对于synchronize来说更加灵活，同时也可以完美的实现生产者-消费者机制，之后的博文中会对此做详细解述。</p>
+<h4 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h4><p><strong>问题1：</strong><br>采用if作为判断条件，那么readyList的大小将超过最大值。当readyList大小为最大值时，会进行wait操作，当所有的生产者都处于waiting状态并且有个消费者使用notifyAll唤醒了所有的生产者，生产者的代码继续向下走，不再会检查边界值，故会产生超过最大值的现象，而采用while则即使生产者被唤醒，代码向下走时仍然会判断边界值。<br><strong>问题2：</strong><br>采用notify代替notifyAll会产生死锁，即所有的线程均处于waiting状态。采用notify可能会出现这样的情况：生产者唤醒生产者，或者消费者唤醒消费者，最后大家都在等待。<br><strong>问题3：</strong><br>去掉最后的wait代码后，会出现一个生产者生产了所有的产品，一个消费者消费了所有的产品，对于生产者和消费者来说会产生不公平的现象。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/images/wechat-reward.JPG" alt="Silencer WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay-reward.JPG" alt="Silencer Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/thread/" rel="tag">#Java并发编程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/13/面试小结-两年经验/" rel="next" title="面试小结-两年经验">
+                <i class="fa fa-chevron-left"></i> 面试小结-两年经验
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/27/MonkeyRunner简述/" rel="prev" title="MonkeyRunner简述">
+                MonkeyRunner简述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Silencer" />
+          <p class="site-author-name" itemprop="name">Silencer</p>
+          <p class="site-description motion-element" itemprop="description">JUST TRY IT</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/smileLuckBoy" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:smile_luck_boy@163.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://huangnx.com/" title="huangnx的博客" target="_blank">huangnx的博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="" title="友链出租" target="_blank">友链出租</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#关键字"><span class="nav-number">1.</span> <span class="nav-text">关键字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实现代码"><span class="nav-number">2.</span> <span class="nav-text">实现代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Lock实现方式"><span class="nav-number">3.</span> <span class="nav-text">Lock实现方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#思考题"><span class="nav-number">4.</span> <span class="nav-text">思考题</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silencer</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+</body>
+</html>

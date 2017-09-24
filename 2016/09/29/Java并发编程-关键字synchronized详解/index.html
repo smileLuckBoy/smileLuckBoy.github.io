@@ -1,0 +1,763 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="googleff237f61db04f234.html" />
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Consolas, "Courier New":300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java并发编程," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="近期在看《JAVA 多线程编程核心技术》这本书，先说下读后感(好像读完书总要搞这么个读后感表明自己研读过)，下面我把自己理解的一些粗俗易懂的知识点整理下，没啥太深入的东西，大牛可忽略此文了，像我一样的JAVA小白可以参考参考~">
+<meta name="keywords" content="Java并发编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发编程-关键字synchronized详解">
+<meta property="og:url" content="http://geekerwang.com/2016/09/29/Java并发编程-关键字synchronized详解/index.html">
+<meta property="og:site_name" content="Silencer2016">
+<meta property="og:description" content="近期在看《JAVA 多线程编程核心技术》这本书，先说下读后感(好像读完书总要搞这么个读后感表明自己研读过)，下面我把自己理解的一些粗俗易懂的知识点整理下，没啥太深入的东西，大牛可忽略此文了，像我一样的JAVA小白可以参考参考~">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-23T14:06:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java并发编程-关键字synchronized详解">
+<meta name="twitter:description" content="近期在看《JAVA 多线程编程核心技术》这本书，先说下读后感(好像读完书总要搞这么个读后感表明自己研读过)，下面我把自己理解的一些粗俗易懂的知识点整理下，没啥太深入的东西，大牛可忽略此文了，像我一样的JAVA小白可以参考参考~">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://geekerwang.com/2016/09/29/Java并发编程-关键字synchronized详解/"/>
+
+
+  <title> Java并发编程-关键字synchronized详解 | Silencer2016 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-83679096-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?00970040195e9a299a86718b9e4b4a2c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=58215292";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Silencer2016</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java并发编程-关键字synchronized详解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-29T09:33:03+08:00" content="2016-09-29">
+              2016-09-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/JAVA/" itemprop="url" rel="index">
+                    <span itemprop="name">JAVA</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+          
+
+          
+              &nbsp; | &nbsp;
+              <span class="page-pv">本文被围观
+              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+              </span>
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>近期在看《JAVA 多线程编程核心技术》这本书，先说下读后感(好像读完书总要搞这么个读后感表明自己研读过)，下面我把自己理解的一些粗俗易懂的知识点整理下，没啥太深入的东西，大牛可忽略此文了，像我一样的JAVA小白可以参考参考~</p>
+<a id="more"></a>
+<h3 id="synchronized-介绍"><a href="#synchronized-介绍" class="headerlink" title="synchronized 介绍"></a>synchronized 介绍</h3><p>synchronized是JAVA中的一个关键字，主要是用来解决多线程之间的 <font color="red">共享变量同步</font> 问题的，举个栗子：<br>A账户上有1000.00RMB，A的老婆和A的女儿刚好都 <font color="red"><strong>同时</strong></font> 要提取600.00RMB（A真特么苦逼），老婆在取钱时，一看还有1000.00RMB，取走了600.00RMB，同时，在老婆取钱操作还没完成时，女儿一看账户上仍有1000.00RMB，也取走了600.00RMB，这样的话，A的账户就剩下-200.00RMB了，银行肯定不乐意的啊。<br>synchronized关键字呢就是解决这类问题的，大体的思路就是当A的老婆和女儿同时取钱时，谁先获得者个账户的使用权(锁,从更加专业的角度来说，应该称之为监视器<strong>monitor</strong>)，谁就可以先操作账户，另外一个人就得等待，这样的话，当一个人取完钱时，账户就只剩余400.00RMB了，另外一个最多只能取400了。</p>
+<p>上述举到的例子中，A的账户就是一个被多个线程(Thread老婆 和 Thread女儿)同时操作的共享变量！</p>
+<h3 id="synchronized-同步方法"><a href="#synchronized-同步方法" class="headerlink" title="synchronized 同步方法"></a>synchronized 同步方法</h3><h4 id="单个synchronized方法"><a href="#单个synchronized方法" class="headerlink" title="单个synchronized方法"></a>单个synchronized方法</h4><p>代码原型如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Service</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">()</span></span>&#123;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看到这样的代码，也许你会问： synchronized获得的是谁的monitor啊？这个问题其实也一度困扰了我好久，后来，我明白了他获取的是Service对象的monitor，我们来写段代码说明下吧：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Account</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">double</span> accountMoney = <span class="number">1000</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subAccount</span><span class="params">(<span class="keyword">double</span> money)</span> </span>&#123;</div><div class="line">    	<span class="comment">// 取款操作不瞬间完成</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">2000</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (money &gt; accountMoney) &#123;</div><div class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">"取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney + <span class="string">",余额不足请充值!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.accountMoney = accountMoney - money;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Run</span> </span>&#123;</div><div class="line">    Account account = <span class="keyword">new</span> Account();</div><div class="line">    Runnable run = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            account.subAccount(<span class="number">600</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Run r = <span class="keyword">new</span> Run();</div><div class="line">        Thread[] threads = <span class="keyword">new</span> Thread[<span class="number">2</span>];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span> ;i &lt; threads.length;i++)&#123;</div><div class="line">            threads[i] = <span class="keyword">new</span> Thread(r.run);</div><div class="line">            threads[i].setName(i % <span class="number">2</span> == <span class="number">0</span> ? <span class="string">"老婆"</span> : <span class="string">"女儿"</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; threads.length;i++)&#123;</div><div class="line">            threads[i].start();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>代码输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">老婆取款600.0当前账户余额400.0</div><div class="line">女儿取款600.0当前账户余额400.0,余额不足请充值!</div></pre></td></tr></table></figure>
+<p>去掉Service中的synchronized，输出如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">女儿取款600.0当前账户余额400.0</div><div class="line">老婆取款600.0当前账户余额400.0</div></pre></td></tr></table></figure></p>
+<p>我们看到在main方法中，同时启动了女儿和老婆的取款线程，当不加 synchronized关键字时，呈现了均取出600的不正确结果，加上此关键字，结果是对的，下面我们分析下：</p>
+<p>加上 synchronized关键字后：<br>老婆和女儿的取款线程首先要获取Account的对象account的monitor,当然，只会有一个会获取到（谁先获取这个全拼运气），另外一个会等待，当先获取到monitor的线程执行完毕后会释放Monitor，另外一个线程才会执行。<br>需要注意的是：这里只申明了一个Account的对象，如果申明两个，两个线程分别采用一个，想想会出现什么结果？<a href="#5F">想看结果请戳这里</a> </p>
+<h4 id="多个synchronized方法"><a href="#多个synchronized方法" class="headerlink" title="多个synchronized方法"></a>多个synchronized方法</h4><p>话不多说，上代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Account</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">double</span> accountMoney = <span class="number">1000</span>;</div><div class="line"></div><div class="line">	<span class="comment">// 通过网银扣钱</span></div><div class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subAccountFromNet</span><span class="params">(<span class="keyword">double</span> money)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">2000</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (money &gt; accountMoney) &#123;</div><div class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">"通过网银取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney + <span class="string">",余额不足请充值!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.accountMoney = accountMoney - money;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"通过网银取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">	<span class="comment">// 通过POS机刷卡</span></div><div class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subAccountFromCard</span><span class="params">(<span class="keyword">double</span> money)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">2000</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (money &gt; accountMoney) &#123;</div><div class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">"通过POS机取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney + <span class="string">",余额不足请充值!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.accountMoney = accountMoney - money;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"通过POS机取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Run</span> </span>&#123;</div><div class="line">    Account service = <span class="keyword">new</span> Account();</div><div class="line">    Runnable net = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            service.subAccountFromNet(<span class="number">600</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    Runnable pos = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            service.subAccountFromCard(<span class="number">600</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Run r = <span class="keyword">new</span> Run();</div><div class="line"></div><div class="line">        Thread thread1 = <span class="keyword">new</span> Thread(r.net,<span class="string">"老婆"</span>);</div><div class="line">        Thread thread2 = <span class="keyword">new</span> Thread(r.pos,<span class="string">"女儿"</span>);</div><div class="line"></div><div class="line">        thread1.start();</div><div class="line">        thread2.start();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>代码输出如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">老婆通过网银取款600.0当前账户余额400.0</div><div class="line">女儿通过POS机取款600.0当前账户余额400.0,余额不足请充值!</div></pre></td></tr></table></figure></p>
+<p>从这里其实我们可以看出，即使是同一个类中的不同的synchronized方法，当某一个线程有先获取了该对象的监视器并且执行了其中另外一个方法的时候，其它的线程此时是无法访问另外的synchronized方法的。</p>
+<h4 id="静态synchronized方法"><a href="#静态synchronized方法" class="headerlink" title="静态synchronized方法"></a>静态synchronized方法</h4><p>代码原型如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Service</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">()</span></span>&#123;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看起来就是在方法上加个static嘛，我们知道，static关键字是针对类的，并不是针对对象的，这里我们可以简单的将static synchronized方法理解为它要获取的是<strong>类</strong>的锁，测试代码如下：<br><a id="5F"><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Account</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">double</span> accountMoney = <span class="number">1000</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subAccount</span><span class="params">(<span class="keyword">double</span> money)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">2000</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (money &gt; accountMoney) &#123;</div><div class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">"取款"</span> + money + <span class="string">"当前账户余额"</span> + accountMoney + <span class="string">",余额不足请充值!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        accountMoney = accountMoney - money;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"取款"</span> + money + <span class="string">"当前账户余额"</span> + accountMoney);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Run</span> </span>&#123;</div><div class="line">	<span class="comment">//这里申明了两个Account对象</span></div><div class="line">    Account service1 = <span class="keyword">new</span> Account();</div><div class="line">    Account service2 = <span class="keyword">new</span> Account();</div><div class="line">    Runnable net = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            service1.subAccount(<span class="number">600</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    Runnable pos = <span class="keyword">new</span> Runnable() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            service2.subAccount(<span class="number">600</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Run r = <span class="keyword">new</span> Run();</div><div class="line"></div><div class="line">        Thread thread1 = <span class="keyword">new</span> Thread(r.net,<span class="string">"老婆"</span>);</div><div class="line">        Thread thread2 = <span class="keyword">new</span> Thread(r.pos,<span class="string">"女儿"</span>);</div><div class="line"></div><div class="line">        thread1.start();</div><div class="line">        thread2.start();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></a></p>
+<p>运行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">老婆取款600.0当前账户余额400.0</div><div class="line">女儿取款600.0当前账户余额400.0</div></pre></td></tr></table></figure></p>
+<p>这里也就是我们之前提到的问题，如果我们申明两个Account对象，而且每个线程都使用不同的Account对象的结果，结果为什么会这样，很简单，因为每个对象都有属于自己的monitor！</p>
+<p>如果我们就是需要申明不同的Account对象，并且还要求结果正确该怎么办呢？解决方案就是我们之前提到的static,在subAccount方法加上static关键字，试试呢？</p>
+<p>运行结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">老婆取款600.0当前账户余额400.0</div><div class="line">女儿取款600.0当前账户余额400.0,余额不足请充值!</div></pre></td></tr></table></figure>
+<p>结果是正确的，因为static synchronized方法相当等于要获取Class的锁，Class锁对所有的类实例都是起作用的，也就是说这个类下的所有对象都使用的是同一把锁，但是Class锁和对象锁是不一样的！ </p>
+<h4 id="非synchronized方法"><a href="#非synchronized方法" class="headerlink" title="非synchronized方法"></a>非synchronized方法</h4><p>即使某个线程通过获取了对象的minotor，执行了synchronized方法，其他线程仍然可以同一时间访问这个对象的非synchronized方法，结论的认证大家自己写写demo就能明白</p>
+<h3 id="synchronized-代码块"><a href="#synchronized-代码块" class="headerlink" title="synchronized 代码块"></a>synchronized 代码块</h3><p>理解了synchronized同步方法，其实这个也大同小异，synchronized同步语句相比synchronized方法具有的优势就是一旦某个线程访问了一个synchronized方法，那么其它线程就不能访问这个对象的其它的synchronized方法，从时间上来说，造成了浪费，但是synchronized代码块可以有效的解决这个问题，只有在synchronized代码块中的代码才有可能造成阻塞，而外部的代码则不会造成阻塞与等待。</p>
+<h4 id="synchronized-Object"><a href="#synchronized-Object" class="headerlink" title="synchronized(Object)"></a>synchronized(Object)</h4><p>代码原型如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">synchronized</span> (obj)&#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>刚才的例子同样可以用此方法实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subAccount</span><span class="params">(<span class="keyword">double</span> money)</span> </span>&#123;</div><div class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">2000</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (money &gt; accountMoney) &#123;</div><div class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">"取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney + <span class="string">",余额不足请充值!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.accountMoney = accountMoney - money;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"取款"</span> + money + <span class="string">"当前账户余额"</span> + <span class="keyword">this</span>.accountMoney);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>当然this可以换成其它的Object，不过需要注意的是</p>
+<ul>
+<li><p>调用这两个方法的线程之间相互影响<br>方法一: synchronized(obj1){}<br>方法二: synchronized(ojb1){}</p>
+</li>
+<li><p>调用这两个方法的线程之间相互不影响<br>方法一: synchronized(obj1){}<br>方法二: synchronized(obj2){}</p>
+</li>
+</ul>
+<h4 id="synchronized-Class"><a href="#synchronized-Class" class="headerlink" title="synchronized(Class)"></a>synchronized(Class)</h4><p>代码原型如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">synchronized</span> (<span class="class"><span class="keyword">class</span>)</span>&#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个和static类型的synchronized方法是类似的，就不具体解释了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>使用synchronized的关键在于你要清楚你获取的是哪个对象或者类的Monitor</li>
+<li>synchronized方法（代码块）和非synchronized方法就像你进了一个大杂院，有很多屋子，每间屋子只能容纳一人，有些屋子没有锁子，有些屋子上了锁，而且所有的锁都一样，这样，当第一个一个人进入大杂院，先拿到钥匙，并且进入一间有锁的屋子，另外一个人就无法进入这间或者另外一间带锁的屋子了，但是可以进入不带锁的屋子。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/images/wechat-reward.JPG" alt="Silencer WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay-reward.JPG" alt="Silencer Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/thread/" rel="tag">#Java并发编程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/12/深入浅出-HashMap(二)/" rel="next" title="深入浅出:HashMap(二)">
+                <i class="fa fa-chevron-left"></i> 深入浅出:HashMap(二)
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/13/面试小结-两年经验/" rel="prev" title="面试小结-两年经验">
+                面试小结-两年经验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Silencer" />
+          <p class="site-author-name" itemprop="name">Silencer</p>
+          <p class="site-description motion-element" itemprop="description">JUST TRY IT</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/smileLuckBoy" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:smile_luck_boy@163.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://huangnx.com/" title="huangnx的博客" target="_blank">huangnx的博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="" title="友链出租" target="_blank">友链出租</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized-介绍"><span class="nav-number">1.</span> <span class="nav-text">synchronized 介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized-同步方法"><span class="nav-number">2.</span> <span class="nav-text">synchronized 同步方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#单个synchronized方法"><span class="nav-number">2.1.</span> <span class="nav-text">单个synchronized方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多个synchronized方法"><span class="nav-number">2.2.</span> <span class="nav-text">多个synchronized方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#静态synchronized方法"><span class="nav-number">2.3.</span> <span class="nav-text">静态synchronized方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#非synchronized方法"><span class="nav-number">2.4.</span> <span class="nav-text">非synchronized方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized-代码块"><span class="nav-number">3.</span> <span class="nav-text">synchronized 代码块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#synchronized-Object"><span class="nav-number">3.1.</span> <span class="nav-text">synchronized(Object)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#synchronized-Class"><span class="nav-number">3.2.</span> <span class="nav-text">synchronized(Class)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silencer</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+</body>
+</html>

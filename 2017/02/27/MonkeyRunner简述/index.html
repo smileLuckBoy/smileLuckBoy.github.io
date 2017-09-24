@@ -1,0 +1,753 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="googleff237f61db04f234.html" />
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Consolas, "Courier New":300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="自动化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="闲来有空，研究了下ANDROID下APP自动化测试，说来也简单，就是调用ANDROID SDK下的MonkeyRunner的API，这里有python版以及java版本的，这里选取了java版本的作为研究对象，不过这API居然特么的没有文档说明，简直是坑，现在做个简单的记录，方便自己和后来人阅读。">
+<meta name="keywords" content="自动化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonkeyRunner简述">
+<meta property="og:url" content="http://geekerwang.com/2017/02/27/MonkeyRunner简述/index.html">
+<meta property="og:site_name" content="Silencer2016">
+<meta property="og:description" content="闲来有空，研究了下ANDROID下APP自动化测试，说来也简单，就是调用ANDROID SDK下的MonkeyRunner的API，这里有python版以及java版本的，这里选取了java版本的作为研究对象，不过这API居然特么的没有文档说明，简直是坑，现在做个简单的记录，方便自己和后来人阅读。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-02-27-1.png">
+<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-02-27-2.png">
+<meta property="og:updated_time" content="2017-09-23T14:06:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonkeyRunner简述">
+<meta name="twitter:description" content="闲来有空，研究了下ANDROID下APP自动化测试，说来也简单，就是调用ANDROID SDK下的MonkeyRunner的API，这里有python版以及java版本的，这里选取了java版本的作为研究对象，不过这API居然特么的没有文档说明，简直是坑，现在做个简单的记录，方便自己和后来人阅读。">
+<meta name="twitter:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-02-27-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://geekerwang.com/2017/02/27/MonkeyRunner简述/"/>
+
+
+  <title> MonkeyRunner简述 | Silencer2016 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-83679096-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?00970040195e9a299a86718b9e4b4a2c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=58215292";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Silencer2016</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MonkeyRunner简述
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-27T22:10:36+08:00" content="2017-02-27">
+              2017-02-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/JAVA/" itemprop="url" rel="index">
+                    <span itemprop="name">JAVA</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+          
+
+          
+              &nbsp; | &nbsp;
+              <span class="page-pv">本文被围观
+              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+              </span>
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>闲来有空，研究了下ANDROID下APP自动化测试，说来也简单，就是调用ANDROID SDK下的MonkeyRunner的API，这里有python版以及java版本的，这里选取了java版本的作为研究对象，不过这API居然特么的没有文档说明，简直是坑，现在做个简单的记录，方便自己和后来人阅读。</p>
+<a id="more"></a>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><h4 id="JDK"><a href="#JDK" class="headerlink" title="JDK"></a>JDK</h4><p>这个就不必多说了，这里采用的JDK8版本</p>
+<h4 id="ANDROID-SDK"><a href="#ANDROID-SDK" class="headerlink" title="ANDROID SDK"></a>ANDROID SDK</h4><p>这个还是简单介绍下，我们只需要用到platform-tools和tools文件下的内容，所以在下载完成sdk后，保留这两个文件夹即可，之后配置好环境变量，在cmd窗口下输入adb后能正常输出内容即配置成功，具体可参考<a href="http://www.cnblogs.com/fangbo/p/3941178.html" target="_blank" rel="external">Android SDK的安装与环境变量配置</a>，这里就不做赘述了。</p>
+<h4 id="模拟器"><a href="#模拟器" class="headerlink" title="模拟器"></a>模拟器</h4><p>ANDROID模拟器现在可谓五花八门，什么夜神啦，天天啦，海马玩啦，总之很多很多，这里推荐Geymotion，一款流畅到和真机媲美的模拟器，不过Geymotion不支持ARM架构的APP，需要装一个Genymotion-ARM-Translation.zip桥即可，需要注意的是，ARM桥需要和模拟器ANDROID版本匹配，当然，最好采用真机进行测试啦（土豪请随意）。</p>
+<h3 id="API简介"><a href="#API简介" class="headerlink" title="API简介"></a>API简介</h3><h4 id="第三方JAR"><a href="#第三方JAR" class="headerlink" title="第三方JAR"></a>第三方JAR</h4><p>环境搭建好就可以撸代码了，我们主要用到了<strong>tools/lib</strong>文件夹下的如下几个包：<br>himpchat.jar、common.jar、ddmlib.jar、juava.jar、hierarchyviewer2lib.jar、jython-standalone.jar、monkeyrunner.jar、sdklib.jar、tools.jar</p>
+<p>还有另外一个需要用到的：<br>org.eclipse.swt.jar</p>
+<p>其中比较重要的是chimpchat.jar和ddmlib.jar，这两个包封装了对模拟器操作的核心代码，之后的大部分二次开发都是基于这两个包。</p>
+<h4 id="API"><a href="#API" class="headerlink" title="API"></a>API</h4><h5 id="AdbBackend"><a href="#AdbBackend" class="headerlink" title="AdbBackend"></a>AdbBackend</h5><p>这个类主要提供发现ADB，连接设备等功能，相当于一个连接池等作用。</p>
+<h5 id="发现设备"><a href="#发现设备" class="headerlink" title="发现设备"></a>发现设备</h5><p>adbBackend.waitForConnection(millsTimeout, deviceId);<br>这个API作用就是连接安卓设备，这里既包含了模拟器，也包含了真机，第一个参数比较好理解，即连接超时时间，第二个参数是安卓机设备号，一般来说，使用<code>adb devices</code>即可看到设备号，当然不同的模拟器显示设备号的方式也不一样，大家可以自行Google下。</p>
+<h5 id="页面跳转"><a href="#页面跳转" class="headerlink" title="页面跳转"></a>页面跳转</h5><p>adbDevice.startActivity(null, null, null, null, categories, new HashMap<string, object="">(), activity, 0);<br>其余参数暂时先不用考虑，现在只需关注倒数第二个参数activity，在ANDROID app中，一般一个页面对应一个activity，所以找到对应的activity，就可以启动相应的页面，查找activity比较简单的方法是使用tools/hierarchyviewer.bat，它可以显示当前页面的activity，如图：<br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-02-27-1.png" alt="activity"><br>当前页面的activity为<strong>com.sankuai.meituan/com.sankuai.meituan.activity.MainActivity</strong>，其中斜杠前面的部分为此APP的packageName。</string,></p>
+<h5 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h5><p>MonkeyRunner同样提供了点击事件，输入事件等API</p>
+<ul>
+<li>根据坐标点击：<br>adbDevice.touch(x, y, TouchPressType.DOWN_AND_UP);<br>屏幕分辨率不同，相同页面元素的坐标也不一样，可以通过设备自带的坐标功能查看元素坐标。</li>
+<li>根据元素ID点击：<br>easyDevice.touch(By.id(id), TouchPressType.DOWN_AND_UP);<br>此方法是monkeyrunner.jar包提供，查找页面元素ID同样使用hierarchyviewer查看器，这里需要注意的是，貌似一个页面多个元素可以共用一个ID的，所以使用此API时<strong><font color="red">需谨慎</font></strong><br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-02-27-2.png" alt="元素查看器"></li>
+<li>输入文本：<br>adbDevice.type(text);</li>
+</ul>
+<h4 id="shell命令"><a href="#shell命令" class="headerlink" title="shell命令"></a>shell命令</h4><p>adbDevice.shell(cmd);<br>具体的adb shell命令大家可以Google下</p>
+<h3 id="问题及解决方案"><a href="#问题及解决方案" class="headerlink" title="问题及解决方案"></a>问题及解决方案</h3><p>大部分的App自动化测试工具可能都存在如下问题：<br>在页面A点击页面元素E直至弹出一个新的页面B，这个过程中间会有一个等待时间，我们无法判断页面B什么时候出现，所以大部分我们的做法是经过测试得出一个相对可靠的等待时间，然而这样的会出现两个问题：</p>
+<ul>
+<li>超过等待时间仍然没有出现页面B（BUG）</li>
+<li>页面B弹出后仍然没有超过等待时间（时间浪费）</li>
+</ul>
+<p>针对MonkeyRunner来说，现在做了如下优化：<br>点击E后轮询判断是否出现了页面页面B，如果出现了，那么则可以进行下一步，未出现，继续等待，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"><span class="comment"> * 等待直到进入希望跳入的VIEW</span></div><div class="line"><span class="comment"> * <span class="doctag">@param</span> viewName</span></div><div class="line"><span class="comment"> * <span class="doctag">@param</span> condition</span></div><div class="line"><span class="comment"> * <span class="doctag">@throws</span> Exception</span></div><div class="line"><span class="comment"> */</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitForGetIntoViewWithCondition</span><span class="params">(String viewName ,Condition condition)</span> <span class="keyword">throws</span> Exception</span></div><div class="line"><span class="function">    </span>&#123;</div><div class="line">        <span class="comment">//判断当前view是否为希望转入的view</span></div><div class="line">        <span class="keyword">int</span> cnt = (<span class="keyword">int</span>)(VIEW_TIMEOUT_MILL_SECS / <span class="number">1000</span>);</div><div class="line">        <span class="keyword">int</span> thisCnt = <span class="number">0</span>;</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>)</div><div class="line">        &#123;</div><div class="line">            HierarchyViewer viewer = getHierarchyViewer();</div><div class="line">            <span class="keyword">if</span> (<span class="keyword">null</span> != viewer)</div><div class="line">            &#123;</div><div class="line">                String windowName = viewer.getFocusedWindowName();</div><div class="line">                <span class="keyword">if</span> (viewName.equals(windowName))</div><div class="line">                &#123;</div><div class="line">                    <span class="keyword">return</span>;</div><div class="line">                &#125;</div><div class="line">              </div><div class="line">                <span class="comment">//判断viewer是否符合condition</span></div><div class="line">                <span class="keyword">if</span> (<span class="keyword">null</span> != condition)</div><div class="line">                &#123;</div><div class="line">                    <span class="keyword">boolean</span> call = condition.callback();</div><div class="line">                    <span class="keyword">if</span> (call)</div><div class="line">                    &#123;</div><div class="line">                        <span class="keyword">return</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            CommonUtil.sleep(<span class="number">1000</span>);</div><div class="line">            thisCnt ++;</div><div class="line">            <span class="keyword">if</span> (thisCnt &gt;= cnt)</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"get into viewer:"</span> + viewName + <span class="string">" fail!"</span>);</div><div class="line">    &#125;</div><div class="line"><span class="comment">/**</span></div><div class="line"><span class="comment"> * 进入HierarchyViewer</span></div><div class="line"><span class="comment"> * <span class="doctag">@return</span></span></div><div class="line"><span class="comment"> */</span></div><div class="line"><span class="function"><span class="keyword">public</span> HierarchyViewer <span class="title">getHierarchyViewer</span><span class="params">()</span></span></div><div class="line"><span class="function">    </span>&#123;</div><div class="line">        <span class="keyword">int</span> cnt = (<span class="keyword">int</span>)(VIEW_TIMEOUT_MILL_SECS / <span class="number">1000</span>);</div><div class="line">        <span class="keyword">int</span> thisCnt = <span class="number">0</span>;</div><div class="line">        </div><div class="line">        </div><div class="line">        <span class="keyword">while</span>(<span class="keyword">null</span> == DeviceBridge.loadWindowData(<span class="keyword">new</span> Window(<span class="keyword">new</span> ViewServerDevice(adbDevice.getDevice()), <span class="string">""</span>, -<span class="number">1</span>)))</div><div class="line">        &#123;</div><div class="line">            CommonUtil.sleep(<span class="number">1000</span>);</div><div class="line">            thisCnt ++;</div><div class="line">            <span class="keyword">if</span> (thisCnt &gt;= cnt)</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> adbDevice.getHierarchyViewer();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>Condition为自定义的条件，因为有时候点击一个元素后进入的可能是不同的页面，所以这里增加了一个Conditon条件的判断，同时有最大时长限制，通过这样的方式，可以有效的保证在最短的时间内进入页面B</p>
+<h3 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h3><p>最后附上一个简单的Deom供大家测试使用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MonkeyRunnerTest</span> </span>&#123;</div><div class="line">	</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line"><span class="function">    </span>&#123;</div><div class="line">        AdbBackend adbBackend = <span class="keyword">new</span> AdbBackend();</div><div class="line">        AdbChimpDevice device = (AdbChimpDevice)adbBackend.waitForConnection(<span class="number">30000</span>, <span class="string">"127.0.0.1:62001"</span>);</div><div class="line">        </div><div class="line">        <span class="comment">//权限设置</span></div><div class="line">        Collection&lt;String&gt; categories = <span class="keyword">new</span> ArrayList&lt;String&gt;();</div><div class="line"></div><div class="line">        <span class="comment">//启动美团s</span></div><div class="line">        <span class="comment">//这个地方可以使用优化过的waitForGetIntoViewWithCondition方法</span></div><div class="line">        String activity = <span class="string">"com.sankuai.meituan/com.sankuai.meituan.activity.MainActivity"</span>;</div><div class="line">        device.startActivity(<span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, categories, <span class="keyword">new</span> HashMap&lt;String, Object&gt;(), activity, <span class="number">0</span>);</div><div class="line">        </div><div class="line">        <span class="comment">//sleep 3s</span></div><div class="line">        CommonUtil.sleep(<span class="number">3000</span>);</div><div class="line"></div><div class="line">        <span class="comment">//根据坐标点击美食选项（分辨率768*1280）</span></div><div class="line">        device.touch(<span class="number">96</span>, <span class="number">360</span>, TouchPressType.DOWN);</div><div class="line"></div><div class="line">        <span class="comment">//sleep 3s</span></div><div class="line">        CommonUtil.sleep(<span class="number">3000</span>);</div><div class="line">        </div><div class="line">        <span class="comment">//关闭美团</span></div><div class="line">        device.shell(<span class="string">"am force-stop com.sankuai.meituan"</span>);</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/images/wechat-reward.JPG" alt="Silencer WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay-reward.JPG" alt="Silencer Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/自动化/" rel="tag">#自动化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/30/Java并发编程-生产者VS消费者/" rel="next" title="Java并发编程-生产者VS消费者">
+                <i class="fa fa-chevron-left"></i> Java并发编程-生产者VS消费者
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/16/Java并发编程-Countdownlatch、Cyclicbarrier/" rel="prev" title="Java并发编程-Countdownlatch、Cyclicbarrier">
+                Java并发编程-Countdownlatch、Cyclicbarrier <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Silencer" />
+          <p class="site-author-name" itemprop="name">Silencer</p>
+          <p class="site-description motion-element" itemprop="description">JUST TRY IT</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/smileLuckBoy" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:smile_luck_boy@163.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://huangnx.com/" title="huangnx的博客" target="_blank">huangnx的博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="" title="友链出租" target="_blank">友链出租</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境搭建"><span class="nav-number">1.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JDK"><span class="nav-number">1.1.</span> <span class="nav-text">JDK</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ANDROID-SDK"><span class="nav-number">1.2.</span> <span class="nav-text">ANDROID SDK</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟器"><span class="nav-number">1.3.</span> <span class="nav-text">模拟器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API简介"><span class="nav-number">2.</span> <span class="nav-text">API简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第三方JAR"><span class="nav-number">2.1.</span> <span class="nav-text">第三方JAR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#API"><span class="nav-number">2.2.</span> <span class="nav-text">API</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#AdbBackend"><span class="nav-number">2.2.1.</span> <span class="nav-text">AdbBackend</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#发现设备"><span class="nav-number">2.2.2.</span> <span class="nav-text">发现设备</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#页面跳转"><span class="nav-number">2.2.3.</span> <span class="nav-text">页面跳转</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#事件"><span class="nav-number">2.2.4.</span> <span class="nav-text">事件</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#shell命令"><span class="nav-number">2.3.</span> <span class="nav-text">shell命令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题及解决方案"><span class="nav-number">3.</span> <span class="nav-text">问题及解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DEMO"><span class="nav-number">4.</span> <span class="nav-text">DEMO</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silencer</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+</body>
+</html>
