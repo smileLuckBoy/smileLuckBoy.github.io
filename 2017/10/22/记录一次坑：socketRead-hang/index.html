@@ -76,7 +76,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="geekerwang, 博客" />
+  <meta name="keywords" content="坑," />
 
 
 
@@ -93,13 +93,14 @@
 
 
 <meta name="description" content="最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：">
+<meta name="keywords" content="坑">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记录一次坑：socketRead hang">
 <meta property="og:url" content="http://geekerwang.com/2017/10/22/记录一次坑：socketRead-hang/index.html">
 <meta property="og:site_name" content="Silencer2016">
 <meta property="og:description" content="最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-10-22T15:45:32.000Z">
+<meta property="og:updated_time" content="2017-10-22T15:54:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记录一次坑：socketRead hang">
 <meta name="twitter:description" content="最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：">
@@ -312,6 +313,25 @@
           </span>
 
           
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/JAVA/" itemprop="url" rel="index">
+                    <span itemprop="name">JAVA</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
 
           
             
@@ -321,11 +341,6 @@
           
           
 
-          
-              &nbsp; | &nbsp;
-              <span class="page-pv">本文被围观
-              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
-              </span>
           
         </div>
       </header>
@@ -343,7 +358,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">RequestConfig.Builder reqConfigBuilder = RequestConfig.custom()</div><div class="line">    <span class="comment">// 从connection manager中获取连接的超时时间</span></div><div class="line">    .setConnectionRequestTimeout(<span class="number">10000</span>)</div><div class="line">    <span class="comment">// 请求获取数据的超时时间,即数据传输时间</span></div><div class="line">    .setConnectTimeout(<span class="number">10000</span>)</div><div class="line">    <span class="comment">// 建立连接的超时时间 </span></div><div class="line">    .setSocketTimeout(<span class="number">10000</span>)</div><div class="line">RequestConfig reqConfig = reqConfigBuilder.build();</div><div class="line">clientBuilder.setDefaultRequestConfig(reqConfig);</div></pre></td></tr></table></figure>
 <p>通过简单的demo测试，发现上述设置超时时间是有用的，只能说明在某些场景下，上述代码存在缺陷.<br>后续发现Stack Overflow中也有很多类似的问题，对于https协议，需要多设置一个PoolingHttpClientConnectionManager的超时参数：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// SSL握手超时时间</span></div><div class="line">manager.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(<span class="number">10000</span>).build());</div></pre></td></tr></table></figure>
-<p>感谢<a href="https://issues.apache.org/jira/browse/HTTPCLIENT-1478" target="_blank" rel="external">https calls ignore http.socket.timeout during SSL Handshake</a>以及<a href="http://zhoujinhuang.iteye.com/blog/2109067" target="_blank" rel="external">httpClient4.3.5超时设置</a>，</p>
+<p>感谢<a href="https://issues.apache.org/jira/browse/HTTPCLIENT-1478" target="_blank" rel="external">https calls ignore http.socket.timeout during SSL Handshake</a>以及<a href="http://zhoujinhuang.iteye.com/blog/2109067" target="_blank" rel="external">httpClient4.3.5超时设置</a>。</p>
 
       
     </div>
@@ -384,6 +399,12 @@
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/坑记录/" rel="tag">#坑</a>
+          
+        </div>
       
 
       
@@ -479,7 +500,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
