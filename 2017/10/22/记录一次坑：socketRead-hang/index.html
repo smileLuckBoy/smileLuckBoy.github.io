@@ -76,7 +76,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="http,python," />
+  <meta name="keywords" content="geekerwang, 博客" />
 
 
 
@@ -92,22 +92,17 @@
 
 
 
-<meta name="description" content="有木有发现这边文章的PV特别高，有木有，有木有，想来刷PV的童鞋看过来~ 几天前使用Hexo + GitHub搭建了自己的博客，然后打了鸡血似得写了几篇博客，再引入不蒜子统计PV后，发现简直门庭冷落（这里不得不说百度简直SB）哎~ 没有高PV的博客怎么能显示出自己的高BIG呢？ 这点问题显然难不倒程序员，无非就是模拟浏览器发送请求嘛~ 有了想法，就开始行动，一开始准备使用熟悉的JAVA语言，后来想">
-<meta name="keywords" content="http,python">
+<meta name="description" content="最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTTP请求刷不蒜子PV">
-<meta property="og:url" content="http://geekerwang.com/2016/09/01/HTTP请求刷不蒜子PV/index.html">
+<meta property="og:title" content="记录一次坑：socketRead hang">
+<meta property="og:url" content="http://geekerwang.com/2017/10/22/记录一次坑：socketRead-hang/index.html">
 <meta property="og:site_name" content="Silencer2016">
-<meta property="og:description" content="有木有发现这边文章的PV特别高，有木有，有木有，想来刷PV的童鞋看过来~ 几天前使用Hexo + GitHub搭建了自己的博客，然后打了鸡血似得写了几篇博客，再引入不蒜子统计PV后，发现简直门庭冷落（这里不得不说百度简直SB）哎~ 没有高PV的博客怎么能显示出自己的高BIG呢？ 这点问题显然难不倒程序员，无非就是模拟浏览器发送请求嘛~ 有了想法，就开始行动，一开始准备使用熟悉的JAVA语言，后来想">
+<meta property="og:description" content="最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-1.png">
-<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-2.png">
-<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-3.png">
-<meta property="og:updated_time" content="2017-09-23T14:06:55.000Z">
+<meta property="og:updated_time" content="2017-10-22T15:45:32.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="HTTP请求刷不蒜子PV">
-<meta name="twitter:description" content="有木有发现这边文章的PV特别高，有木有，有木有，想来刷PV的童鞋看过来~ 几天前使用Hexo + GitHub搭建了自己的博客，然后打了鸡血似得写了几篇博客，再引入不蒜子统计PV后，发现简直门庭冷落（这里不得不说百度简直SB）哎~ 没有高PV的博客怎么能显示出自己的高BIG呢？ 这点问题显然难不倒程序员，无非就是模拟浏览器发送请求嘛~ 有了想法，就开始行动，一开始准备使用熟悉的JAVA语言，后来想">
-<meta name="twitter:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-1.png">
+<meta name="twitter:title" content="记录一次坑：socketRead hang">
+<meta name="twitter:description" content="最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：">
 
 
 
@@ -128,10 +123,10 @@
 
 
 
-  <link rel="canonical" href="http://geekerwang.com/2016/09/01/HTTP请求刷不蒜子PV/"/>
+  <link rel="canonical" href="http://geekerwang.com/2017/10/22/记录一次坑：socketRead-hang/"/>
 
 
-  <title> HTTP请求刷不蒜子PV | Silencer2016 </title>
+  <title> 记录一次坑：socketRead hang | Silencer2016 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -299,7 +294,7 @@
             
             
               
-                HTTP请求刷不蒜子PV
+                记录一次坑：socketRead hang
               
             
           </h1>
@@ -311,30 +306,11 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-01T11:21:30+08:00" content="2016-09-01">
-              2016-09-01
+            <time itemprop="dateCreated" datetime="2017-10-22T21:10:36+08:00" content="2017-10-22">
+              2017-10-22
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
@@ -362,31 +338,12 @@
       
 
       
-        <p>有木有发现这边文章的<strong>PV</strong>特别高，有木有，有木有，想来刷PV的童鞋看过来~</p>
-<p>几天前使用Hexo + GitHub搭建了自己的博客，然后打了鸡血似得写了几篇博客，再引入不蒜子统计PV后，发现简直门庭冷落（这里不得不说百度简直SB）哎~</p>
-<p>没有高PV的博客怎么能显示出自己的高BIG呢？</p>
-<p>这点问题显然难不倒程序员，无非就是模拟浏览器发送请求嘛~</p>
-<p>有了想法，就开始行动，一开始准备使用熟悉的JAVA语言，后来想想，这个简单的功能似乎用轻量级的Python来完成更加合适！</p>
-<p>下面就进入正题~</p>
-<a id="more"></a>
-<h3 id="API准备工作"><a href="#API准备工作" class="headerlink" title="API准备工作"></a>API准备工作</h3><p>使用Python发送http请求其实很简单，我们可以使用httplib模块或者urllib模块来搞定，DEMO代码如下：<br>通过httplib模块模拟GET请求,详细用法 <a href="https://docs.python.org/2/library/httplib.html" target="_blank" rel="external">点击这里</a></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 建立http连接</span></div><div class="line">httpClient = httplib.HTTPConnection(host)</div><div class="line"><span class="comment"># 请求URL，使用GET方法</span></div><div class="line">httpClient.request(method=<span class="string">"GET"</span>, url=url)</div><div class="line"><span class="comment"># 获取相应</span></div><div class="line">response = httpClient.getresponse()</div></pre></td></tr></table></figure>
-<p>通过urllib模块模拟GET请求,详细用法 <a href="https://docs.python.org/2/library/urllib2.html" target="_blank" rel="external">点击这里</a></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 请求URL，默认GET请求</span></div><div class="line">res = urllib2.urlopen(url=url)</div></pre></td></tr></table></figure>
-<p>是不是很简单的呢，熟悉了基本的API后，我们进入后续步骤~</p>
-<h3 id="通过浏览器分析请求报文"><a href="#通过浏览器分析请求报文" class="headerlink" title="通过浏览器分析请求报文"></a>通过浏览器分析请求报文</h3><p>这里推荐Chrome浏览器，虽然比较耗内存，但绝对是开发利器，同时我们使用httplib模块进行测试<br>基本的Chrome调试技巧我这里就不介绍了，大家可以参考 <a href="http://sentsin.com/web/1185.html" target="_blank" rel="external">分析chrome中的network面板</a><br>这块是我的截图：</p>
-<p><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-1.png" alt="截图1"></p>
-<p>分析这里的请求内容，首先我定位到了第一个请求，因为它是一个主要的入口<br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-2.png" alt="截图2"></p>
-<p>之后我们把Request URL贴到代码的相应位置模拟浏览器来发送请求，但发现并没有什么卵用，我开始怀疑请求的URL有问题，之后仔细分析下所有的请求，发现有busuanzi字样的请求，随后我把URL定位到了这个请求中</p>
-<p><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2016-09-01-3.png" alt="截图3"></p>
-<p>感觉这个URL很有戏啊，之后就是替换URL，然并卵….</p>
-<p>好吧，一定是哪里出了问题…<br>仔细分析这个请求，发现它的Request Header中包含的referer这个字段有值哎，先把它加到heades中，死马当活马医，难说成功了…</p>
-<p>握草，居然成功了….<br>居然在我都不知道干了啥的情况下它成功了…这个简直不能忍，之后就是查资料分析</p>
-<p>referer这个字段是判断当前页面是从哪个页面进来的，一般我们会用在防盗链上，由于这个对不蒜子的请求是来自当前页面的，那么他的referer也就是当前的页面了</p>
-<p>这样的话，不蒜子通过referer就知道了我们现在访问的是哪个页面，就可以给我们加一条PV了</p>
-<h3 id="源码奉上"><a href="#源码奉上" class="headerlink" title="源码奉上"></a>源码奉上</h3><p>最后奉上源码，这里提供了两种方式，大家随便取一种即可，在main中把referer(要刷PV的页面,包含中文的需要转码)替换成自己的，这里默认刷5次，自己可以随便调哈~</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*-coding:utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> httplib</div><div class="line"><span class="keyword">import</span> urllib2</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment"># 采用httplib方式</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">http_get_client1</span><span class="params">(host, url, headers=&#123;&#125;)</span>:</span></div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        httpClient = httplib.HTTPConnection(host)</div><div class="line">        httpClient.request(method=<span class="string">"GET"</span>, url=url, headers=headers)</div><div class="line"></div><div class="line">        response = httpClient.getresponse()</div><div class="line">        <span class="keyword">print</span> response.status</div><div class="line"></div><div class="line"></div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        <span class="keyword">print</span> e</div><div class="line">    <span class="keyword">finally</span>:</div><div class="line">        <span class="keyword">if</span> httpClient:</div><div class="line">            httpClient.close()</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment"># 采用urllib方式</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">http_get_client2</span><span class="params">(url, headers=&#123;&#125;)</span>:</span></div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        req = urllib2.Request(url=url, headers=headers)</div><div class="line">        res = urllib2.urlopen(req)</div><div class="line"></div><div class="line">        <span class="keyword">print</span> res.getcode()</div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        <span class="keyword">print</span> e</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    host = <span class="string">"busuanzi.ibruce.info"</span></div><div class="line">    url = <span class="string">"http://%s/busuanzi?jsonpCallback=BusuanziCallback_1"</span> % host</div><div class="line">    referer = <span class="string">"http://geekerwang.com/2016/08/30/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-ThreadLocal/"</span></div><div class="line">    </div><div class="line">    headers = &#123;<span class="string">'Referer'</span>: referer&#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</div><div class="line">        http_get_client1(host, url, headers)</div><div class="line">        <span class="comment"># http_get_client2(url,headers)</span></div></pre></td></tr></table></figure>
-<p><br></p>
+        <p>最近在项目中，用到了大量的多线程中使用httpClient的场景，上线后发现线程池线程数量越来越少,通过jstack导出堆栈信息，发现大量的如下信息：<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&quot;pool-1034-thread-2&quot; #7057672 prio=5 os_prio=0 tid=0x00007fbad81e9000 nid=0x711 runnable [0x00007fba579b9000]</div><div class="line">   java.lang.Thread.State: RUNNABLE</div><div class="line">    at java.net.SocketInputStream.socketRead0(Native Method)</div><div class="line">    at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)</div><div class="line">    at java.net.SocketInputStream.read(SocketInputStream.java:170)</div><div class="line">    at java.net.SocketInputStream.read(SocketInputStream.java:141)</div><div class="line">    at sun.security.ssl.InputRecord.readFully(InputRecord.java:465)</div><div class="line">    at sun.security.ssl.InputRecord.read(InputRecord.java:503)</div><div class="line">    at sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:973)</div><div class="line">    - locked &lt;0x00000000c7ccd168&gt; (a java.lang.Object)</div><div class="line">    at sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1375)</div><div class="line">    - locked &lt;0x00000000c7ccd128&gt; (a java.lang.Object)</div><div class="line">    at sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1403)</div><div class="line">    at sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1387)</div><div class="line">    at org.apache.http.conn.ssl.SSLConnectionSocketFactory.createLayeredSocket(SSLConnectionSocketFactory.java:394)</div><div class="line">    at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.upgrade(DefaultHttpClientConnectionOperator.java:192)</div><div class="line">    at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.upgrade(PoolingHttpClientConnectionManager.java:369)</div><div class="line">    at org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:415)</div><div class="line">    at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:236)</div><div class="line">    at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:184)</div><div class="line">    at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:88)</div><div class="line">    at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)</div><div class="line">    at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:184)</div><div class="line">    at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82)</div><div class="line">    at java.lang.Thread.run(Thread.java:745)</div><div class="line"></div><div class="line">   Locked ownable synchronizers:</div><div class="line">    - &lt;0x00000000c7c9e380&gt; (a java.util.concurrent.ThreadPoolExecutor$Worker)</div></pre></td></tr></table></figure></p>
+<p>看样子是httpClent读取资源时卡在了socketRead，检查代码后发现，socketReadTimeout是设置过了的，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">RequestConfig.Builder reqConfigBuilder = RequestConfig.custom()</div><div class="line">    <span class="comment">// 从connection manager中获取连接的超时时间</span></div><div class="line">    .setConnectionRequestTimeout(<span class="number">10000</span>)</div><div class="line">    <span class="comment">// 请求获取数据的超时时间,即数据传输时间</span></div><div class="line">    .setConnectTimeout(<span class="number">10000</span>)</div><div class="line">    <span class="comment">// 建立连接的超时时间 </span></div><div class="line">    .setSocketTimeout(<span class="number">10000</span>)</div><div class="line">RequestConfig reqConfig = reqConfigBuilder.build();</div><div class="line">clientBuilder.setDefaultRequestConfig(reqConfig);</div></pre></td></tr></table></figure>
+<p>通过简单的demo测试，发现上述设置超时时间是有用的，只能说明在某些场景下，上述代码存在缺陷.<br>后续发现Stack Overflow中也有很多类似的问题，对于https协议，需要多设置一个PoolingHttpClientConnectionManager的超时参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// SSL握手超时时间</span></div><div class="line">manager.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(<span class="number">10000</span>).build());</div></pre></td></tr></table></figure>
+<p>感谢<a href="https://issues.apache.org/jira/browse/HTTPCLIENT-1478" target="_blank" rel="external">https calls ignore http.socket.timeout during SSL Handshake</a>以及<a href="http://zhoujinhuang.iteye.com/blog/2109067" target="_blank" rel="external">httpClient4.3.5超时设置</a>，</p>
 
       
     </div>
@@ -428,30 +385,18 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/http/" rel="tag">#http</a>
-          
-            <a href="/tags/python/" rel="tag">#python</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/30/深入浅出-ThreadLocal/" rel="next" title="深入浅出:ThreadLocal">
-                <i class="fa fa-chevron-left"></i> 深入浅出:ThreadLocal
+              <a href="/2017/07/16/Java并发编程-Countdownlatch、Cyclicbarrier/" rel="next" title="Java并发编程-Countdownlatch、Cyclicbarrier">
+                <i class="fa fa-chevron-left"></i> Java并发编程-Countdownlatch、Cyclicbarrier
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/09/06/深入浅出-HashMap(一)/" rel="prev" title="深入浅出:HashMap(一)">
-                深入浅出:HashMap(一) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -601,7 +546,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#API准备工作"><span class="nav-number">1.</span> <span class="nav-text">API准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过浏览器分析请求报文"><span class="nav-number">2.</span> <span class="nav-text">通过浏览器分析请求报文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码奉上"><span class="nav-number">3.</span> <span class="nav-text">源码奉上</span></a></li></ol></div>
+              <p class="post-toc-empty">此文章未包含目录</p>
             
           </div>
         </section>
