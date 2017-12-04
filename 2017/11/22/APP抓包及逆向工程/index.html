@@ -104,7 +104,11 @@
 <meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog2017-11-21-a2.png">
 <meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog2017-11-21-a3.png">
 <meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog2017-11-21-a4.png?imageView2/2/h/400">
-<meta property="og:updated_time" content="2017-11-22T23:48:06.024Z">
+<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a5.png">
+<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a6.png">
+<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a7.png">
+<meta property="og:image" content="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a8.png">
+<meta property="og:updated_time" content="2017-12-04T23:40:22.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="APP抓包及逆向工程入门教学">
 <meta name="twitter:description" content="近期在研究APP抓包及Android逆向工程，将经验总结一下。">
@@ -425,6 +429,20 @@
 <li>通过APKIDE/dex2jar/d2j-dex2jar.bat将dex文件转换为JAR文件</li>
 <li>查看源码，领会APK作者代码意图。</li>
 </ol>
+<h3 id="AS调试Smali"><a href="#AS调试Smali" class="headerlink" title="AS调试Smali"></a>AS调试Smali</h3><p>通过Android Studio可以调试部分APK，步骤如下：</p>
+<ol>
+<li>下载Android Studio</li>
+<li>安装插件<a href="http://od6ojrbik.bkt.clouddn.com/images/blog2017-11-21-a4.png?imageView2/2/h/400" target="_blank" rel="external">smalidea</a><br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a5.png" alt="安装插件"></li>
+<li>在模拟器上安装目标APK</li>
+<li>通过AS反编译APK<br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a6.png" alt="反编译APK"></li>
+<li>通过<code>adb connect deviceId</code>连接模拟器</li>
+<li>通过<code>adb shell am start -D -n packageName/ActivName</code> 以Debug模式启动APK</li>
+<li>通过<code>adb shell ps</code>查看目标APK进程号PID</li>
+<li>通过<code>adb forward tcp:8801 jdwp:7642</code>将主机和模拟器PID绑定</li>
+<li>AS设置远程调试，端口为上述命令中tcp后端口<br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a7.png" alt="DEBUG"></li>
+<li>启动DEBUG模式，进入DEBUG状态<br><img src="http://od6ojrbik.bkt.clouddn.com/images/blog/2017-11-21-a8.png" alt="DEBUG"></li>
+</ol>
+<p><em>备注</em><br>如遇到调试时连接失败，请检查是否开启了Fidder、Charles、DDMS,如开，关闭即可,同时关闭模拟器代理设置</p>
 <p><strong>未完待续！</strong></p>
 
       
@@ -634,7 +652,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#APP抓包"><span class="nav-number">1.</span> <span class="nav-text">APP抓包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Fidder"><span class="nav-number">1.1.</span> <span class="nav-text">Fidder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Charles"><span class="nav-number">1.2.</span> <span class="nav-text">Charles</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逆向工程"><span class="nav-number">2.</span> <span class="nav-text">逆向工程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础"><span class="nav-number">2.1.</span> <span class="nav-text">基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤"><span class="nav-number">2.2.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#360脱壳"><span class="nav-number">2.3.</span> <span class="nav-text">360脱壳</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#APP抓包"><span class="nav-number">1.</span> <span class="nav-text">APP抓包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Fidder"><span class="nav-number">1.1.</span> <span class="nav-text">Fidder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Charles"><span class="nav-number">1.2.</span> <span class="nav-text">Charles</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逆向工程"><span class="nav-number">2.</span> <span class="nav-text">逆向工程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础"><span class="nav-number">2.1.</span> <span class="nav-text">基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤"><span class="nav-number">2.2.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#360脱壳"><span class="nav-number">2.3.</span> <span class="nav-text">360脱壳</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AS调试Smali"><span class="nav-number">2.4.</span> <span class="nav-text">AS调试Smali</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
